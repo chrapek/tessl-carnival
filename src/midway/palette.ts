@@ -54,4 +54,16 @@ export const palette = {
   pants: ['#2d3a6b', '#3b2a4f', '#5a4a3a'],
   bunting: [colors.stripeA, colors.accent, '#2b8ccc', colors.stripeB],
   balloons: [colors.stripeA, colors.accent, '#2b8ccc', colors.water, '#f59ac0'],
+
+  /** The sky and clouds for each kind of weather. Sunny is the daytime palette above. */
+  weather: {
+    sky: { sunny: '#38b4e6', cloudy: '#8fb6cc', rainy: '#6f8799', snowy: '#c3d3df' },
+    skyHigh: { sunny: '#1f9bd6', cloudy: '#7299b0', rainy: '#4f6577', snowy: '#a3b8c8' },
+    cloud: { sunny: '#bfeafc', cloudy: '#e4ecf1', rainy: '#9aa6b0', snowy: '#f4f8fb' },
+    cloudShade: { sunny: '#94d8f4', cloudy: '#c3d0d8', rainy: '#7c8994', snowy: '#d6e0e8' },
+  },
+  /** Laid thinly over the midway when the sky is grey. */
+  gloom: '#2f3d4a',
+  rain: '#dcebf5',
+  snow: '#ffffff',
 } as const;
