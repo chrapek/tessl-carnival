@@ -1694,15 +1694,22 @@ export interface Cloud {
   speed: number;
 }
 
-export function drawCloud(ctx: Ctx, x: number, y: number, size: number) {
-  ctx.fillStyle = palette.cloud;
+export function drawCloud(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  size: number,
+  color: string = palette.cloud,
+  shade: string = palette.cloudShade,
+) {
+  ctx.fillStyle = color;
   ctx.beginPath();
   ctx.roundRect(x - 30 * size, y - 8 * size, 60 * size, 12 * size, 6 * size);
   ctx.arc(x - 14 * size, y - 8 * size, 11 * size, 0, Math.PI * 2);
   ctx.arc(x + 4 * size, y - 13 * size, 15 * size, 0, Math.PI * 2);
   ctx.arc(x + 20 * size, y - 6 * size, 9 * size, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = palette.cloudShade;
+  ctx.fillStyle = shade;
   ctx.beginPath();
   ctx.roundRect(x - 30 * size, y, 60 * size, 4 * size, 2 * size);
   ctx.fill();
@@ -1728,6 +1735,59 @@ export function drawFloaters(ctx: Ctx, floaters: readonly Floater[]) {
     ctx.stroke();
     oval(ctx, f.x + sway, f.y, 5, 6.5, f.color);
     oval(ctx, f.x + sway - 1.8, f.y - 2.5, 1.4, 2, 'rgba(255,255,255,0.6)');
+  }
+  ctx.globalAlpha = 1;
+}
+
+// ── The weather ───────────────────────────────────────────────────────────
+
+const RAIN_DROPS = 140;
+const SNOW_FLAKES = 110;
+
+/**
+ * Rain and snow falling over the whole view, in CSS pixels. `amount` (0 to 1)
+ * thins them out while the weather changes. Each particle's place is worked
+ * out from the time, so nothing needs to be stored between frames.
+ */
+export function drawPrecipitation(
+  ctx: Ctx,
+  width: number,
+  height: number,
+  t: number,
+  rain: number,
+  snow: number,
+) {
+  if (rain > 0) {
+    ctx.strokeStyle = palette.rain;
+    ctx.lineWidth = 1.2;
+    ctx.globalAlpha = 0.55;
+    ctx.beginPath();
+    const drops = Math.round(RAIN_DROPS * rain);
+    for (let i = 0; i < drops; i++) {
+      const speed = 520 + hash(i, 1, 7) * 220;
+      const x =
+        (((hash(i, 2, 7) * (width + 60) - t * 90) % (width + 60)) + width + 60) % (width + 60);
+      const y = ((hash(i, 3, 7) * (height + 40) + t * speed) % (height + 40)) - 20;
+      ctx.moveTo(x, y);
+      ctx.lineTo(x - 3, y + 12);
+    }
+    ctx.stroke();
+  }
+  if (snow > 0) {
+    ctx.fillStyle = palette.snow;
+    ctx.globalAlpha = 0.85;
+    ctx.beginPath();
+    const flakes = Math.round(SNOW_FLAKES * snow);
+    for (let i = 0; i < flakes; i++) {
+      const r = 1.2 + hash(i, 4, 7) * 1.6;
+      const sway = Math.sin(t * (0.8 + hash(i, 5, 7)) + i) * 12;
+      const x =
+        (((hash(i, 6, 7) * (width + 30) + sway) % (width + 30)) + width + 30) % (width + 30);
+      const y = ((hash(i, 7, 7) * (height + 20) + t * (30 + r * 14)) % (height + 20)) - 10;
+      ctx.moveTo(x + r, y);
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+    }
+    ctx.fill();
   }
   ctx.globalAlpha = 1;
 }
